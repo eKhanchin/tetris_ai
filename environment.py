@@ -227,6 +227,9 @@ class Tetris(QWidget):
         self.send_state.connect(self.model_thread.receive_state)
         self.model_thread.start()
     
+    def _is_ai_player(self):
+        return self.train_ai or self.player_ai
+    
     def keyPressEvent(self, event: QKeyEvent):
         """ Captures user's key presses and defines specific actions
         for each key.
@@ -235,7 +238,7 @@ class Tetris(QWidget):
             event (QKeyEvent): Contains information about the key event.
         """
         
-        if self.train_ai or self.player_ai:
+        if self._is_ai_player():
             return
         
         if event.key() == Qt.Key_Left:
@@ -291,20 +294,21 @@ class Tetris(QWidget):
         elif action == Action.DOWN.value:
             is_down = self.manager.move_down()
             if is_down:
-                if not self.train_ai and not self.player_ai:
+                if not self._is_ai_player():
                     filled_lines = self.manager.clear_filled_lines() * 100
                     self.score += filled_lines
+                    
                 if self.manager.is_game_over():
                     game_over = True
         elif action == Action.EXIT.value:
             self.close()
-
+        
         self.score_label.setText(str(self.score))
         self._draw_next_grid()
         self._draw_grid()
         
-        if self.train_ai or self.player_ai:
-            ai_score = self.manager.get_score()
+        if self._is_ai_player():
+            ai_score = self.manager.get_score()  # TODO: Doesn't clear lines correctly
             self.send_state.emit((self.manager.board, ai_score, game_over))
         
         return self.manager.board, filled_lines, game_over

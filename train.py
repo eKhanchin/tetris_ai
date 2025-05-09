@@ -8,6 +8,7 @@ from model.brain import Brain
 from model.dqn import DQN
 
 
+# TODO: Put hyperparameters into a file - TOML or JSON.
 # Hyper parameters
 LEARNING_RATE = 0.00001
 MAX_MEMORY = 100_000
@@ -30,7 +31,7 @@ WIDTH = env.board_width
 brain = Brain((HEIGHT, WIDTH, LAST_STATES_NUMBER), LEARNING_RATE)
 dqn = DQN(MAX_MEMORY, GAMMA)
 epochs_number = 0
-ACTIONS = [value for value in Action]
+ACTIONS = list(Action)
 
         
 # Loads existing model or create a new one.
@@ -111,5 +112,8 @@ while True:
         pickle.dump([dqn.memory, epsilon, epochs_number], file)
     os.replace(MEMORY_FILE_PATH_TEMP, MEMORY_FILE_PATH)
     
-    print(f'Epoch {epochs_number} - current score: {reward}, epsilon: {epsilon:.5f}, memory slots: {len(dqn.memory)}, steps: {steps}')
+    print((
+        f'Epoch {epochs_number} - current score: {reward},'
+        f' epsilon: {epsilon:.5f}, memory slots: {len(dqn.memory)}, steps: {steps}'
+    ))
         
